@@ -2,6 +2,7 @@ import os, sys, math, json, time, csv, string, itertools, pathlib
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional
 
+from PIL import ImageFont, ImageDraw, Image
 import numpy as np
 import cv2
 
@@ -452,6 +453,8 @@ def main():
     last_pred = "?"
     last_conf  = 0.0
 
+
+    # ------------------- UI fix -------------------
     while True:
         ok, frame = cap.read()
         if not ok: break
@@ -475,13 +478,33 @@ def main():
             if last_conf > 0.8 and last_pred in label_list:
                 on_prediction(last_pred)
 
-            # overlay info
-            cv2.putText(frame, f"Pred: {last_pred}  conf={last_conf:.2f}  mode={'Heuristic' if use_heuristic else 'ML'}",
-                        (10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0) if last_conf>0.8 else (0,200,200), 2)
+            # ------------------- Use Roboto Font -------------------
+            font_path = "E:/asl_xyz/src/Roboto_Condensed-Regular.ttf"  # Path to the Roboto font
+            font = ImageFont.truetype(font_path, 20)  # Load the font
 
-        # UI texts
-        cv2.putText(frame, f"Label: {current_label}  [C]apture  [T]rain  [E]val  [S]ave  [L]oad  [H]toggle  [Q]uit",
-                    (10, frame.shape[0]-15), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,255), 2)
+            # Convert frame to PIL image to use custom font
+            pil_img = Image.fromarray(frame)
+            draw = ImageDraw.Draw(pil_img)
+
+            # Overlay info with Roboto font
+            draw.text((10, 20), f"Pred: {last_pred}  conf={last_conf:.2f}  mode={'Heuristic' if use_heuristic else 'ML'}", font=font, 
+                      fill=(0, 0, 0))
+
+            # Convert back to OpenCV format
+            frame = np.array(pil_img)
+
+        # UI texts with Roboto font
+        pil_img = Image.fromarray(frame)
+        draw = ImageDraw.Draw(pil_img)
+
+        # Draw label and buttons with Roboto font
+        draw.text((10, frame.shape[0]-55), f"Label: {current_label}", font=font, fill=(0, 0, 0))
+        draw.text((10, frame.shape[0]-30), f"C Capture  H Toggle  T Train  E Eval  S Save  L Load  Q Quit", font=font, fill=(0, 0, 0))
+    
+
+        # Convert back to OpenCV format
+        frame = np.array(pil_img)
+
 
         cv2.imshow("ASL Realtime", frame)
         k = cv2.waitKey(1) & 0xFF

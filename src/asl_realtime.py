@@ -493,14 +493,18 @@ def main():
             # Convert back to OpenCV format
             frame = np.array(pil_img)
 
+
+        # วาดพื้นหลังสีขาวสำหรับ Menu ที่ขอบล่างซ้าย
+        cv2.rectangle(frame, (0, frame.shape[0]-60), (frame.shape[1], frame.shape[0]), (255, 255, 255), -1)
+
         # UI texts with Roboto font
         pil_img = Image.fromarray(frame)
         draw = ImageDraw.Draw(pil_img)
 
         # Draw label and buttons with Roboto font
-        draw.text((10, frame.shape[0]-55), f"Label: {current_label}", font=font, fill=(0, 0, 0))
+        draw.text((10, frame.shape[0]-55), f"Label: {last_pred}", font=font, fill=(0, 0, 0))
         draw.text((10, frame.shape[0]-30), f"C Capture  H Toggle  T Train  E Eval  S Save  L Load  Q Quit", font=font, fill=(0, 0, 0))
-    
+
 
         # Convert back to OpenCV format
         frame = np.array(pil_img)
@@ -508,6 +512,12 @@ def main():
 
         cv2.imshow("ASL Realtime", frame)
         k = cv2.waitKey(1) & 0xFF
+
+        # ตรวจสอบการปิดหน้าต่าง (กากบาท)
+        if cv2.getWindowProperty("ASL Realtime", cv2.WND_PROP_VISIBLE) < 1:
+            break
+
+        # ตรวจสอบการกดคีย์
         if k == ord('q') or k == ord('Q'):
             break
         elif k == ord('h') or k == ord('H'):

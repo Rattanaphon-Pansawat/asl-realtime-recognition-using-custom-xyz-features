@@ -502,7 +502,7 @@ def main():
         draw = ImageDraw.Draw(pil_img)
 
         # Draw label and buttons with Roboto font
-        draw.text((10, frame.shape[0]-55), f"Label: {last_pred}", font=font, fill=(0, 0, 0))
+        draw.text((10, frame.shape[0]-55), f"Label: {current_label}", font=font, fill=(0, 0, 0))
         draw.text((10, frame.shape[0]-30), f"C Capture  H Toggle  T Train  E Eval  S Save  L Load  Q Quit", font=font, fill=(0, 0, 0))
 
 
